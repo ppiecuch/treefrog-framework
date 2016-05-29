@@ -1,8 +1,10 @@
 TARGET   = treefrog
 TEMPLATE = lib
-CONFIG  += shared console c++11
+CONFIG  += staticlib console c++11
 QT      += sql network xml
-DEFINES += TF_MAKEDLL
+
+!staticlib:DEFINES += TF_MAKEDLL
+
 INCLUDEPATH += ../include
 DEPENDPATH  += ../include
 windows:CONFIG(debug, debug|release) {
@@ -17,7 +19,7 @@ isEmpty(target.path) {
   windows {
     target.path = C:/TreeFrog/$${VERSION}/bin
   } else:macx {
-    target.path = /Library/Frameworks
+    target.path = /usr/local/lib
   } else:unix {
     target.path = /usr/lib
   }
@@ -37,17 +39,6 @@ windows {
   test.files = $$TEST_FILES $$TEST_CLASSES
   test.path = $$header.path/TfTest
   INSTALLS += header script test
-} else:macx {
-  CONFIG += lib_bundle
-  FRAMEWORK_HEADERS.version = Versions
-  FRAMEWORK_HEADERS.files = $$HEADER_FILES $$HEADER_CLASSES
-  FRAMEWORK_HEADERS.files += $$MONGODB_FILES $$MONGODB_CLASSES
-
-  FRAMEWORK_HEADERS.path = Headers
-  FRAMEWORK_TEST.version = Versions
-  FRAMEWORK_TEST.files = $$TEST_FILES $$TEST_CLASSES
-  FRAMEWORK_TEST.path = Headers/TfTest
-  QMAKE_BUNDLE_DATA += FRAMEWORK_HEADERS FRAMEWORK_TEST
 } else:unix {
   header.files = $$HEADER_FILES $$HEADER_CLASSES
   header.files += $$MONGODB_FILES $$MONGODB_CLASSES
@@ -335,9 +326,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 # Files for MongoDB
 INCLUDEPATH += ../3rdparty/mongo-c-driver/src/mongoc ../3rdparty/mongo-c-driver/src/libbson/src/bson
-windows {
-#  DEFINES += MONGO_STATIC_BUILD
+DEFINES += MONGO_STATIC_BUILD
 
+windows {
   win32-msvc* {
     CONFIG(debug, debug|release) {
       LIBS += ..\3rdparty\mongo-c-driver\debug\mongoc.lib
