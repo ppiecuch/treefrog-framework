@@ -5,7 +5,7 @@ CONFIG  += console c++11
 CONFIG  -= app_bundle
 QT      += network
 QT      -= gui
-DEFINES += TF_DLL
+
 INCLUDEPATH += $$header.path
 
 include(../../tfbase.pri)
@@ -29,10 +29,10 @@ windows {
   win32-msvc* {
     LIBS += advapi32.lib
   }
-} else:macx {
-  LIBS += -F$$lib.path -framework treefrog
 } else:unix {
   LIBS += -L$$lib.path -ltreefrog
+  
+  include(../../tfconfig.pri)
 
   # c++11
   lessThan(QT_MAJOR_VERSION, 5) {
