@@ -1,35 +1,26 @@
 #ifndef TREACTCOMPONENT_H
 #define TREACTCOMPONENT_H
 
-#include <QString>
+#include <QStringList>
 #include <QDateTime>
 #include <TGlobal>
 
-class TJSContext;
-class QJSValue;
+class TJSLoader;
 
 
 class T_CORE_EXPORT TReactComponent
 {
 public:
-    TReactComponent(const QString &scriptFile);
-    virtual ~TReactComponent();
+    TReactComponent(const QString &moduleName, const QStringList &searchPaths = QStringList());
+    virtual ~TReactComponent() { }
 
-    QString filePath() const;
-    bool load(const QString &scriptFile);
+    void import(const QString &moduleName);
+    void import(const QString &defaultMember, const QString &moduleName);
     QString renderToString(const QString &component);
     QDateTime loadedDateTime() const { return loadedTime; }
 
-    static QString compileJsx(const QString &jsx);
-    static QString compileJsxFile(const QString &fileName);
-
-protected:
-    void init();
-
 private:
-    TJSContext *context;
-    QJSValue *jsValue;
-    QString scriptPath;
+    TJSLoader *jsLoader;
     QDateTime loadedTime;
 
     Q_DISABLE_COPY(TReactComponent)

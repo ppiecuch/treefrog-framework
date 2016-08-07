@@ -5,124 +5,56 @@
  * the New BSD License, which is incorporated herein by reference.
  */
 
-#include <QJSEngine>
-#include <QJSValue>
-#include <QFile>
-#include <QDir>
-#include <QTextStream>
-#include <TWebApplication>
-#include <TJSContext>
+#include <TJSLoader>
 #include <TReactComponent>
 #include "tsystemglobal.h"
 
+//#define tSystemError(fmt, ...)  printf(fmt "\n", ## __VA_ARGS__)
+//#define tSystemDebug(fmt, ...)  printf(fmt "\n", ## __VA_ARGS__)
 
-TReactComponent::TReactComponent(const QString &script)
-    : context(new TJSContext(false)), jsValue(new QJSValue()), scriptPath(), loadedTime()
+
+TReactComponent::TReactComponent(const QString &moduleName, const QStringList &searchPaths)
+    : jsLoader(new TJSLoader(moduleName, TJSLoader::Jsx)), loadedTime()
 {
-    init();
-    load(script);
+    jsLoader->setSearchPaths(searchPaths);
+    jsLoader->import("React", "react-with-addons");
+    jsLoader->import("ReactDOMServer", "react-dom-server");
 }
 
 
-// TReactComponent::TReactComponent(const QStringList &scripts)
-//     : context(new TJSContext()), jsValue(new QJSValue())
-// {
-//     init();
-//     for (auto &s : scripts) {
-//         load(s);
-//     }
-// }
-
-
-TReactComponent::~TReactComponent()
+void TReactComponent::import(const QString &moduleName)
 {
-    delete jsValue;
-    delete context;
+    jsLoader->import(moduleName);
 }
 
 
-void TReactComponent::init()
+void TReactComponent::import(const QString &defaultMember, const QString &moduleName)
 {
-    load(Tf::app()->webRootPath()+ "script" + QDir::separator() + "react.min.js");
-    load(Tf::app()->webRootPath()+ "script" + QDir::separator() + "react-dom-server.min.js");
-}
-
-
-QString TReactComponent::filePath() const
-{
-    return scriptPath;
-}
-
-
-bool TReactComponent::load(const QString &scriptFile)
-{
-    bool ok;
-    if (QFileInfo(scriptFile).suffix().compare("jsx", Qt::CaseInsensitive) == 0) {
-        // Loads JSX file
-        QString program = compileJsxFile(scriptFile);
-        QJSValue res = context->evaluate(program, scriptFile);
-        ok = !res.isError();
-    } else {
-        ok = !context->load(scriptFile).isError();
-    }
-
-    if (ok) {
-        loadedTime = QDateTime::currentDateTime();
-        scriptPath = scriptFile;
-    } else {
-        loadedTime = QDateTime();
-        scriptPath = QString();
-    }
-    return ok;
+    jsLoader->import(defaultMember, moduleName);
 }
 
 
 QString TReactComponent::renderToString(const QString &component)
 {
-    QString comp = component.trimmed();
-    if (!comp.startsWith("<")) {
-        comp.prepend('<');
-    }
-    if (!comp.endsWith("/>")) {
-        comp.append("/>");
-    }
+    auto *context = jsLoader->load();
 
-    QString func = QLatin1String("ReactDOMServer.renderToString(") + compileJsx(comp) + QLatin1String(");");
-    return context->evaluate(func).toString();
-}
-
-
-QString TReactComponent::compileJsx(const QString &jsx)
-{
-    static TJSContext js(false);
-    static bool once = false;
-    static QMutex mutex;
-
-    if (Q_UNLIKELY(!once)) {
-        QMutexLocker locker(&mutex);
-        if (!once) {
-            js.load(Tf::app()->webRootPath()+ "script" + QDir::separator() + "JSXTransformer.js");
-            once = true;
+    if (loadedTime.isNull()) {
+        loadedTime = QDateTime::currentDateTime();
+    } else {
+        if (context) {
+            QFileInfo fi(context->modulePath());
+            if (context->modulePath().isEmpty() || (fi.exists() && fi.lastModified() > loadedTime)) {
+                context = jsLoader->load(true);
+                QDateTime::currentDateTime();
+            }
         }
     }
 
-    QJSValue jscode = js.call("JSXTransformer.transform", QJSValue(jsx));
-    //tSystemDebug("code:%s", qPrintable(jscode.property("code").toString()));
-    return jscode.property("code").toString();
-}
-
-
-QString TReactComponent::compileJsxFile(const QString &fileName)
-{
-    QFile script(fileName);
-    if (!script.open(QIODevice::ReadOnly)) {
-        // open error
-        tSystemError("TReactComponent open error: %s", qPrintable(fileName));
+    if (!context) {
         return QString();
     }
 
-    QTextStream stream(&script);
-    QString contents = stream.readAll();
-    script.close();
-    return compileJsx(contents);
+    QString func = QLatin1String("ReactDOMServer.renderToString(") + TJSLoader::compileJsx(component) + QLatin1String(");");
+    tSystemDebug("TReactComponent func: %s", qPrintable(func));
+    return context->evaluate(func).toString();
 }

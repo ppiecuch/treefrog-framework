@@ -74,8 +74,9 @@ defaults.files += defaults/validation.ini
 defaults.files += defaults/views.pro
 # React scripts
 defaults.files += defaults/JSXTransformer.js
-defaults.files += defaults/react.min.js
-defaults.files += defaults/react-dom-server.min.js
+defaults.files += defaults/react.js
+defaults.files += defaults/react-with-addons.js
+defaults.files += defaults/react-dom-server.js
 windows {
   defaults.files += defaults/_dummymodel.h
   defaults.files += defaults/_dummymodel.cpp
@@ -158,5 +159,7 @@ HEADERS += mailergenerator.h
 SOURCES += mailergenerator.cpp
 HEADERS += mongocommand.h
 SOURCES += mongocommand.cpp
+HEADERS += helpergenerator.h
+SOURCES += helpergenerator.cpp
 HEADERS += util.h
 SOURCES += util.cpp
