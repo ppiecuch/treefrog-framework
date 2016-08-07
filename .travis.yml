@@ -1,21 +1,23 @@
 language: cpp
+sudo: required
+dist: trusty
 
 env:
   global:
     - CI_WORK=`pwd`
 
 before_install:
-  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update
   - sudo apt-get install -y qtbase5-dev libsqlite3-dev qt5-default qt5-qmake qttools5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools
+  - sudo apt-get install -y gdb
 
 install:
   - g++ --version
   - qmake -v
-  - ./configure
-  - make  -j4 -C src
-  - sudo make -C src install
-  - make  -j4 -C tools
+  - ./configure --prefix=$HOME/local --bindir=/usr/bin
+  - make -j4 -C src
+  - make -C src install
+  - make -j4 -C tools
   - sudo make -C tools install
   - treefrog -v
 

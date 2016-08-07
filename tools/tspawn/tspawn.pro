@@ -26,7 +26,7 @@ windows {
   }
   LIBS += -L"$$target.path"
 } else:unix {
-  LIBS += -L$$lib.path -ltreefrog
+  LIBS += -Wl,-rpath,$$lib.path -L$$lib.path -ltreefrog
 
   include(../../tfconfig.pri)
 

@@ -40,12 +40,11 @@ windows {
   test.path = $$header.path/TfTest
   INSTALLS += header script test
 } else:unix {
+  macx:QMAKE_SONAME_PREFIX=@rpath
+
   header.files = $$HEADER_FILES $$HEADER_CLASSES
   header.files += $$MONGODB_FILES $$MONGODB_CLASSES
 
-  isEmpty(header.path) {
-    header.path = /usr/include/treefrog
-  }
   test.files = $$TEST_FILES $$TEST_CLASSES
   test.path = $$header.path/TfTest
   INSTALLS += header test
