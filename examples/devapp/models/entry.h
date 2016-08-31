@@ -34,6 +34,7 @@ public:
 
     static Entry create(int id, const QString &name, const QString &address, int revision);
     static Entry create(const QVariantHash &values);
+    static Entry create(const QVariantMap &values);
     static Entry get(int id);
     static QList<Entry> getAll();
 

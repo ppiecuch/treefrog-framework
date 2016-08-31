@@ -1,9 +1,8 @@
 TARGET = helper
 TEMPLATE = lib
-CONFIG += shared x86_64
+CONFIG += staticlib x86_64
 QT  -= gui
 QT  += 
-DEFINES += TF_DLL
 DESTDIR = ../lib
 DEPENDPATH +=
 

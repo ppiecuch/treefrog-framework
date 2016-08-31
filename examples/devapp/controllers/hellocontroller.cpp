@@ -53,7 +53,7 @@ void HelloController::index()
     helper.setAddress(tr("板橋区中台3丁目"));
     T_EXPORT(helper);
 
-    QVariantHash values = httpRequest().allParameters();
+    QVariantMap values = httpRequest().allParameters();
     T_EXPORT(values);
 
     EntryName ent = EntryName::create(1, "aoyama", "urushiyama", 22);
@@ -73,7 +73,7 @@ void HelloController::index()
     //httpResponse().setCookie("hoge3", tr("aoyamakkkkkkk!!! -._~;ハイパーテキスト").toUtf8(), QDateTime::currentDateTime().addSecs(3600));
 
     // session test
-    foreach (QString key, static_cast<QVariantHash *>(&session())->keys()) {
+    foreach (QString key, static_cast<QVariantMap *>(&session())->keys()) {
         tDebug("****************  %s  %s", qPrintable(key), session().value(key).toByteArray().data());
     }
 

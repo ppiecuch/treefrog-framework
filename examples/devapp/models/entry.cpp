@@ -92,10 +92,23 @@ Entry Entry::create(int id, const QString &name, const QString &address, int rev
     return Entry(obj);
 }
 
-Entry Entry::create(const QVariantHash &values)
+Entry Entry::create(const QVariantMap &values)
 {
     Entry model;
     model.setProperties(values);
+    if (!model.d->create()) {
+        model.d->clear();
+    }
+    return model;
+}
+
+Entry Entry::create(const QVariantHash &values)
+{
+    Entry model;
+	QVariantMap mapValues;
+	foreach (const QString &key, values.keys())
+		mapValues[key] = values[key];
+    model.setProperties(mapValues);
     if (!model.d->create()) {
         model.d->clear();
     }

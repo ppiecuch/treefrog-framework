@@ -2,12 +2,12 @@ TARGET = controller
 TEMPLATE = lib
 CONFIG += shared debug
 QT -= gui
-QT += network sql
+QT += network sql xml
 DEFINES += TF_DLL
-DESTDIR = ../../lib
+DESTDIR = ../lib
 INCLUDEPATH += ../helpers ../models
 DEPENDPATH  += ../helpers ../models
-LIBS  += -L../../lib -lhelper -lmodel
+LIBS  += -L../lib -lhelper -lmodel
 
 include(../appbase.pri)
 

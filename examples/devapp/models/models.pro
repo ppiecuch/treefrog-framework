@@ -11,12 +11,11 @@ LIBS += -L../lib -lhelper
 
 include(../appbase.pri)
 
-HEADERS += entrynameobject.h
+HEADERS += sqlobjects/entrynameobject.h
 HEADERS += entryname.h
 SOURCES += entryname.cpp
-HEADERS += entryobject.h
+HEADERS += sqlobjects/entryobject.h
 HEADERS += entry.h
 SOURCES += entry.cpp
 #HEADERS += entry2.h
 #SOURCES += entry2.cpp
-

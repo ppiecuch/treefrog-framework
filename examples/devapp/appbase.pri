@@ -7,9 +7,20 @@ win32 {
     LIBS += -ltreefrog1
   }
 } else:macx {
-  INCLUDEPATH += /Library/Frameworks/treefrog.framework/Versions/Current/Headers
-  LIBS += -framework treefrog
+  isEmpty(TFDIR) {
+      exists($$PWD/../../dist) {
+        TFDIR = $$PWD/../../dist
+      	message("*** Using prebuild at $$TFDIR")
+      } else {
+        TFDIR = /usr/local
+      }
+  }
+  INCLUDEPATH += $$TFDIR/include/treefrog
+  LIBS += -ltreefrog -L$$TFDIR/lib
+  include(../../tfconfig.pri)
 } else:unix {
-  INCLUDEPATH += ../../include /usr/include/treefrog
+  INCLUDEPATH += $$PWD/../../include /usr/include/treefrog
   LIBS += -ltreefrog
 }
+
+OTHER_FILES += appbase.pri
